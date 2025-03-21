@@ -1,0 +1,45 @@
+<% content_for :page_title, "Tableau de bord" %>
+
+<!-- Désactiver Turbo pour cette page -->
+<div data-turbo="false">
+  <!-- Conteneur pour notre dashboard React -->
+  <div id="dashboard-app"></div>
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const element = document.getElementById('dashboard-app');
+    if (!element) return;
+
+    // Données pour le dashboard
+    const data = {
+      stats: {
+        totalApplications: <%= @application_count || 0 %>,
+        pendingApplications: <%= @pending_applications || 0 %>,
+        acceptedApplications: <%= @accepted_applications || 0 %>,
+        rejectedApplications: <%= @rejected_applications || 0 %>
+      },
+      recentApplications: <%= raw (@recent_applications || []).to_json(
+        only: [:id, :status, :applied_date],
+        include: { job_listing: { only: [:id, :title], include: { company: { only: [:id, :name] } } }
+      }) %>,
+      technologies: <%= raw (@top_technologies || []).to_json %>,
+      upcomingSteps: <%= raw (@upcoming_steps || []).to_json(
+        only: [:id, :step_type, :next_action_date],
+        include: {
+          application: {
+            only: [:id],
+            include: {
+              job_listing: {
+                only: [:id, :title],
+                include: { company: { only: [:id, :name] } }
+              }
+            }
+          }
+        }) %>
+    };
+
+    // Monter le composant React
+    window.mountReactComponent(window.ReactComponents.Dashboard, 'dashboard-app', data);
+  });
+</script>

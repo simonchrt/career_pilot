@@ -1,0 +1,24 @@
+<% content_for :page_title, "Mes candidatures" %>
+<% content_for :page_actions do %>
+  <%= link_to "Nouvelle candidature", job_listings_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700" %>
+<% end %>
+
+<div id="applications-list-app" data-applications="<%= @applications.to_json(
+  only: [:id, :status, :applied_date, :priority, :response_date, :interview_date],
+  include: {
+    job_listing: {
+      only: [:id, :title, :remote],
+      include: { company: { only: [:id, :name] } }
+    }
+  }
+).html_safe %>"></div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const rootElement = document.getElementById('applications-list-app');
+    if (rootElement) {
+      const applications = JSON.parse(rootElement.dataset.applications);
+      window.mountReactComponent(window.ReactComponents.ApplicationsList, 'applications-list-app', { applications });
+    }
+  });
+</script>
