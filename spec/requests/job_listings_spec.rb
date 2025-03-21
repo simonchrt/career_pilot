@@ -43,7 +43,6 @@ RSpec.describe "JobListings", type: :request do
       }
     end
     it "creates a new job listing and redirects" do
-      p valid_params
       expect{
         post job_listings_path, params: valid_params
       }.to change(JobListing, :count).by(1)
