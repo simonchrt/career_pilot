@@ -63,6 +63,14 @@
                   Technologies
                 <% end %>
               </li>
+              <li>
+                <%= link_to new_quick_application_path, class: "flex items-center px-4 py-2 hover:bg-gray-700 #{controller_name == 'quick_applications' ? 'bg-gray-700' : ''}", data: { turbo: false } do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                  </svg>
+                  Candidature rapide
+                <% end %>
+              </li>
             </ul>
           </nav>
           <div class="mt-auto px-4 py-2 border-t border-gray-700">

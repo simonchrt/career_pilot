@@ -1,0 +1,178 @@
+<% content_for :page_title, "Nouvelle candidature rapide" %>
+
+<div class="bg-white shadow sm:rounded-lg mb-6">
+  <div class="px-4 py-5 sm:p-6">
+    <%= form_with(url: quick_applications_path, method: :post, local: true, class: "space-y-8") do |form| %>
+      <!-- Section Entreprise -->
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Entreprise</h3>
+        <div class="flex items-center mb-4">
+          <div class="flex items-center">
+            <%= radio_button_tag :use_existing_company, "0", true, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300",
+                                data: { action: "click->toggle#show", 'toggle-target': '#new-company-form', 'toggle-hide': '#existing-company-form' } %>
+            <%= label_tag :use_existing_company_0, "Nouvelle entreprise", class: "ml-2 block text-sm text-gray-900" %>
+          </div>
+          <div class="flex items-center ml-6">
+            <%= radio_button_tag :use_existing_company, "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300",
+                                data: { action: "click->toggle#show", 'toggle-target': '#existing-company-form', 'toggle-hide': '#new-company-form' } %>
+            <%= label_tag :use_existing_company_1, "Entreprise existante", class: "ml-2 block text-sm text-gray-900" %>
+          </div>
+        </div>
+
+        <div id="existing-company-form" class="hidden">
+          <div class="sm:col-span-3">
+            <%= label_tag :company_id, "Entreprise", class: "block text-sm font-medium text-gray-700" %>
+            <%= select_tag :company_id, options_from_collection_for_select(@companies, :id, :name), { include_blank: "Sélectionner une entreprise", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" } %>
+          </div>
+        </div>
+
+        <div id="new-company-form">
+          <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-3">
+              <%= label_tag "company[name]", "Nom", class: "block text-sm font-medium text-gray-700" %>
+              <%= text_field_tag "company[name]", nil, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= label_tag "company[website]", "Site web", class: "block text-sm font-medium text-gray-700" %>
+              <%= url_field_tag "company[website]", nil, placeholder: "https://example.com", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= label_tag "company[industry]", "Secteur d'activité", class: "block text-sm font-medium text-gray-700" %>
+              <%= text_field_tag "company[industry]", nil, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+
+            <div class="sm:col-span-3">
+              <%= label_tag "company[location]", "Localisation", class: "block text-sm font-medium text-gray-700" %>
+              <%= text_field_tag "company[location]", nil, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Offre d'emploi -->
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Offre d'emploi</h3>
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <div class="sm:col-span-4">
+            <%= label_tag "job_listing[title]", "Titre", class: "block text-sm font-medium text-gray-700" %>
+            <%= text_field_tag "job_listing[title]", nil, required: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-2">
+            <div class="flex items-center h-full mt-8">
+              <div class="flex items-center h-5">
+                <%= check_box_tag "job_listing[remote]", "1", false, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+              </div>
+              <div class="ml-3 text-sm">
+                <%= label_tag "job_listing[remote]", "Télétravail possible", class: "font-medium text-gray-700" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= label_tag "job_listing[description]", "Description", class: "block text-sm font-medium text-gray-700" %>
+            <%= text_area_tag "job_listing[description]", nil, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= label_tag "job_listing[url]", "URL de l'offre", class: "block text-sm font-medium text-gray-700" %>
+            <%= url_field_tag "job_listing[url]", nil, placeholder: "https://example.com/job-posting", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-3">
+            <%= label_tag "job_listing[contract_type]", "Type de contrat", class: "block text-sm font-medium text-gray-700" %>
+            <%= select_tag "job_listing[contract_type]", options_for_select(JobListing.contract_types.keys.map { |t| [t.humanize, t] }), { include_blank: "Sélectionner", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" } %>
+          </div>
+
+          <div class="sm:col-span-3"></div>
+
+          <div class="sm:col-span-2">
+            <%= label_tag "job_listing[salary_min]", "Salaire minimum", class: "block text-sm font-medium text-gray-700" %>
+            <%= number_field_tag "job_listing[salary_min]", nil, min: 0, step: 1000, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-2">
+            <%= label_tag "job_listing[salary_max]", "Salaire maximum", class: "block text-sm font-medium text-gray-700" %>
+            <%= number_field_tag "job_listing[salary_max]", nil, min: 0, step: 1000, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-2">
+            <%= label_tag "job_listing[currency]", "Devise", class: "block text-sm font-medium text-gray-700" %>
+            <%= select_tag "job_listing[currency]", options_for_select([['€', 'EUR'], ['$', 'USD'], ['£', 'GBP']], 'EUR'), { class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" } %>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= label_tag :technology_ids, "Technologies", class: "block text-sm font-medium text-gray-700" %>
+            <div class="mt-1">
+              <div class="flex flex-wrap gap-2">
+                <% @technologies.each do |technology| %>
+                  <div class="flex items-center">
+                    <%= check_box_tag 'technology_ids[]', technology.id, false, id: "technology_#{technology.id}", class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+                    <%= label_tag "technology_#{technology.id}", technology.name, class: "ml-1 mr-2 text-sm text-gray-700" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Candidature -->
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Candidature</h3>
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <div class="sm:col-span-3">
+            <%= label_tag "application[status]", "Statut", class: "block text-sm font-medium text-gray-700" %>
+            <%= select_tag "application[status]", options_for_select(Application.statuses.keys.map { |s| [s.humanize, s] }, 'applied'), { class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" } %>
+          </div>
+
+          <div class="sm:col-span-3">
+            <%= label_tag "application[priority]", "Priorité (1-5)", class: "block text-sm font-medium text-gray-700" %>
+            <%= number_field_tag "application[priority]", 3, min: 1, max: 5, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-3">
+            <%= label_tag "application[applied_date]", "Date de candidature", class: "block text-sm font-medium text-gray-700" %>
+            <%= date_field_tag "application[applied_date]", Date.today, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+
+          <div class="sm:col-span-6">
+            <%= label_tag "application[notes]", "Notes", class: "block text-sm font-medium text-gray-700" %>
+            <%= text_area_tag "application[notes]", nil, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <%= link_to "Annuler", dashboard_path, class: "ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        <%= submit_tag "Créer la candidature", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Fonction pour basculer entre les formulaires
+  const showNewCompany = document.getElementById('use_existing_company_0');
+  const showExistingCompany = document.getElementById('use_existing_company_1');
+  const newCompanyForm = document.getElementById('new-company-form');
+  const existingCompanyForm = document.getElementById('existing-company-form');
+
+  showNewCompany.addEventListener('change', function() {
+    if (this.checked) {
+      newCompanyForm.classList.remove('hidden');
+      existingCompanyForm.classList.add('hidden');
+    }
+  });
+
+  showExistingCompany.addEventListener('change', function() {
+    if (this.checked) {
+      existingCompanyForm.classList.remove('hidden');
+      newCompanyForm.classList.add('hidden');
+    }
+  });
+});
+</script>
