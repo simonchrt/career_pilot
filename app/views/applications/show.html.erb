@@ -1,2 +1,202 @@
-<h1>Applications#show</h1>
-<p>Find me in app/views/applications/show.html.erb</p>
+<% content_for :page_title, @application.job_listing.title %>
+<% content_for :page_actions do %>
+  <%= link_to "Éditer", edit_application_path(@application), class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-2" %>
+  <%= button_to "Supprimer", application_path(@application), method: :delete, data: { confirm: "Êtes-vous sûr de vouloir supprimer cette candidature ?" }, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700" %>
+<% end %>
+
+<div data-turbo="false">
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          <%= @application.job_listing.title %>
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          <%= @application.job_listing.company.name %>
+        </p>
+      </div>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= status_badge(@application.status) %>">
+        <%= status_text(@application.status) %>
+      </span>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Date de candidature
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @application.applied_date ? l(@application.applied_date, format: :long) : "Non précisée" %>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Date de réponse
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @application.response_date ? l(@application.response_date, format: :long) : "Non précisée" %>
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Date d'entretien
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @application.interview_date ? l(@application.interview_date, format: :long) : "Non précisée" %>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Priorité
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @application.priority || "Non définie" %>
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Notes
+          </dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= simple_format(@application.notes) || "Aucune note" %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Étapes de la candidature -->
+  <div class="mt-6">
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Étapes de la candidature
+        </h3>
+        <button type="button" id="add-step-button" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+          Ajouter une étape
+        </button>
+      </div>
+
+      <div id="add-step-form" class="px-4 py-5 bg-gray-50 hidden">
+        <%= form_with(model: [@application, @new_step], url: application_application_steps_path(@application), local: true, class: "space-y-4") do |form| %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <%= form.label :step_type, "Type d'étape", class: "block text-sm font-medium text-gray-700" %>
+              <%= form.select :step_type, options_for_select(ApplicationStep.step_types.keys.map { |t| [t.humanize, t] }), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            </div>
+
+            <div>
+              <%= form.label :date, "Date", class: "block text-sm font-medium text-gray-700" %>
+              <%= form.date_field :date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            </div>
+          </div>
+
+          <div>
+            <%= form.label :notes, "Notes", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <%= form.label :next_action_date, "Date de la prochaine action", class: "block text-sm font-medium text-gray-700" %>
+              <%= form.date_field :next_action_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            </div>
+
+            <div class="flex items-end justify-start">
+              <div class="flex items-center h-5 mt-4">
+                <%= form.check_box :completed, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+                <%= form.label :completed, "Étape complétée", class: "ml-2 text-sm font-medium text-gray-700" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="button" id="cancel-step-button" class="mr-2 px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Annuler
+            </button>
+            <%= form.submit "Ajouter", class: "px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="border-t border-gray-200">
+        <% if @application_steps.any? %>
+          <div class="flow-root">
+            <ul role="list" class="-mb-8">
+              <% @application_steps.each_with_index do |step, index| %>
+                <li>
+                  <div class="relative pb-8">
+                    <% if index < @application_steps.size - 1 %>
+                      <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                    <% end %>
+                    <div class="relative flex space-x-3">
+                      <div>
+                        <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white <%= step.completed? ? 'bg-green-500' : 'bg-blue-500' %>">
+                          <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <% if step.completed? %>
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <% else %>
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                            <% end %>
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="min-w-0 flex-1 pt-1.5 space-y-1">
+                        <div class="flex justify-between">
+                          <h3 class="text-sm font-medium text-gray-900">
+                            <%= step.step_type.humanize %>
+                            <span class="text-xs text-gray-500 ml-2">
+                              <%= l(step.date.to_date, format: :long) %>
+                            </span>
+                          </h3>
+                          <div class="flex">
+                            <%= link_to 'Modifier', '#', class: "text-xs text-blue-600 hover:text-blue-800 mr-2" %>
+                            <%= button_to 'Supprimer', application_application_step_path(@application, step), method: :delete, data: { confirm: "Êtes-vous sûr ?" }, class: "text-xs text-red-600 hover:text-red-800 bg-transparent border-0 p-0" %>
+                          </div>
+                        </div>
+                        <% if step.notes.present? %>
+                          <p class="text-sm text-gray-500">
+                            <%= simple_format(step.notes) %>
+                          </p>
+                        <% end %>
+                        <% if step.next_action_date.present? %>
+                          <p class="text-sm text-gray-500">
+                            Prochaine action: <%= l(step.next_action_date, format: :long) %>
+                          </p>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% else %>
+          <div class="text-center py-6 px-4">
+            <p class="text-gray-500">Aucune étape ajoutée pour cette candidature</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const addButton = document.getElementById('add-step-button');
+    const cancelButton = document.getElementById('cancel-step-button');
+    const form = document.getElementById('add-step-form');
+
+    if (addButton && form) {
+      addButton.addEventListener('click', function() {
+        form.classList.toggle('hidden');
+      });
+    }
+
+    if (cancelButton && form) {
+      cancelButton.addEventListener('click', function() {
+        form.classList.add('hidden');
+      });
+    }
+  });
+</script>
