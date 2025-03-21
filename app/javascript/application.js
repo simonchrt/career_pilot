@@ -4,7 +4,6 @@ import "./controllers"
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import './controllers';
 
 // Fonction pour monter les composants React
 window.mountReactComponent = (Component, elementId, props = {}) => {
