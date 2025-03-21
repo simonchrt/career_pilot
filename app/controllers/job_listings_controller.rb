@@ -3,14 +3,12 @@ class JobListingsController < ApplicationController
   before_action :set_job_listing, only: [:show, :edit, :update, :destroy]
 
   def index
-    @job_listings = JobListing.includes(:company).order(created_at: :desc)
+    @job_listings = JobListing.includes(:company, :technologies).order(created_at: :desc)
   end
 
   def show
     @company = @job_listing.company
     @technologies = @job_listing.technologies
-    @application = current_user.applications.find_by(job_listing: @job_listing) ||
-                   Application.new(job_listing: @job_listing, user: current_user)
   end
 
   def new

@@ -1,2 +1,69 @@
-<h1>Applications#new</h1>
-<p>Find me in app/views/applications/new.html.erb</p>
+<% content_for :page_title, "Nouvelle candidature" %>
+
+<div class="bg-white shadow sm:rounded-lg">
+  <div class="px-4 py-5 sm:p-6">
+    <%= form_with(model: @application, local: true, class: "space-y-6") do |form| %>
+      <% if @application.errors.any? %>
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                <%= pluralize(@application.errors.count, "erreur") %> :
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @application.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <%= form.hidden_field :job_listing_id %>
+
+        <div class="sm:col-span-6">
+          <%= form.label :job_listing_id, "Offre d'emploi", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <p class="text-sm text-gray-500">
+              <%= @job_listing.title %> - <%= @job_listing.company.name %>
+            </p>
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :status, "Statut", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :status, options_for_select(Application.statuses.keys.map { |s| [s.humanize, s] }, 'applied'), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :priority, "Priorité (1-5)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :priority, min: 1, max: 5, value: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :applied_date, "Date de candidature", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.date_field :applied_date, value: Date.today, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= form.label :notes, "Notes", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_area :notes, rows: 5, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <%= link_to "Annuler", job_listings_path, class: "ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        <%= form.submit "Créer", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+  </div>
+</div>
