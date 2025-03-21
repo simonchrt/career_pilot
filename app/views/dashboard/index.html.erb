@@ -1,2 +1,46 @@
-<h1>Dashboard#index</h1>
-<p>Find me in app/views/dashboard/index.html.erb</p>
+<% content_for :page_title, "Tableau de bord" %>
+
+<div id="dashboard-app"
+     data-stats="<%= {
+       totalApplications: @application_count,
+       pendingApplications: @pending_applications,
+       acceptedApplications: @accepted_applications,
+       rejectedApplications: @rejected_applications
+     }.to_json.html_safe %>"
+     data-recent-applications="<%= @recent_applications.to_json(
+       only: [:id, :status, :applied_date],
+       include: {
+         job_listing: { only: [:id, :title], include: { company: { only: [:id, :name] } } }
+       }
+     ).html_safe %>"
+     data-technologies="<%= @top_technologies.to_json.html_safe %>"
+     data-upcoming-steps="<%= @upcoming_steps.to_json(
+       only: [:id, :step_type, :next_action_date],
+       include: {
+         application: {
+           only: [:id],
+           include: {
+             job_listing: {
+               only: [:id, :title],
+               include: { company: { only: [:id, :name] } }
+             }
+           }
+         }
+       }
+     ).html_safe %>">
+</div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const rootElement = document.getElementById('dashboard-app');
+    if (rootElement) {
+      const props = {
+        stats: JSON.parse(rootElement.dataset.stats),
+        recentApplications: JSON.parse(rootElement.dataset.recentApplications),
+        technologies: JSON.parse(rootElement.dataset.technologies),
+        upcomingSteps: JSON.parse(rootElement.dataset.upcomingSteps)
+      };
+      window.mountReactComponent(window.ReactComponents.Dashboard, 'dashboard-app', props);
+    }
+  });
+</script>
