@@ -55,7 +55,7 @@ RSpec.describe "QuickApplications", type: :request do
     let(:company_exist_params) do
       {
         use_existing_company: "1",
-        company_id: Company.last.id
+        company_id: Company.last.id,
         job_listing: {
           title: "Super Job",
           description: "A great job opportunity",
