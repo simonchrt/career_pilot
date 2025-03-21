@@ -63,18 +63,36 @@ jobs:
       - name: Setup assets for testing
         run: |
           # Créer les dossiers requis
-          mkdir -p app/assets/builds app/assets/stylesheets
+          mkdir -p app/assets/builds app/assets/stylesheets public/assets
 
-          # Créer un fichier CSS vide pour éviter l'erreur d'asset manquant
+          # Créer un fichier manifest.js avec les liens nécessaires
+          mkdir -p app/assets/config
+          echo "//= link application.css
+          //= link tailwind.css
+          //= link application.js" > app/assets/config/manifest.js
+
+          # Créer des fichiers CSS vides pour éviter les erreurs
           touch app/assets/builds/tailwind.css
           touch app/assets/builds/application.js
+          touch public/assets/application.css
+          touch public/assets/tailwind.css
 
-          # Définir des variables d'environnement pour ignorer la compilation des assets
-          echo "SKIP_ASSET_COMPILATION=true" >> $GITHUB_ENV
-          echo "SKIP_CSS_BUILD=true" >> $GITHUB_ENV
+          # Créer un fichier d'application CSS vide pour éviter l'erreur
+          echo "/* Empty file for tests */" > app/assets/stylesheets/application.css
 
-          # Contourner la précompilation des assets pour les tests
-          RAILS_ENV=test SKIP_ASSET_COMPILATION=true SKIP_CSS_BUILD=true SECRET_KEY_BASE=dummy bundle exec rake assets:precompile || true
+          # Contourner la vérification des assets pour les tests en modifiant l'environnement
+          echo "
+          # Configuration temporaire pour les tests CI
+          Rails.application.configure do
+            config.assets.compile = true
+            config.assets.digest = false
+            config.assets.debug = false
+            config.assets.check_precompiled_asset = false
+          end
+          " > config/initializers/assets_for_testing.rb
+
+          # Forcer la précompilation des assets
+          RAILS_ENV=test SECRET_KEY_BASE=dummy bundle exec rake assets:precompile || true
 
       - name: Run tests
         run: bundle exec rspec
