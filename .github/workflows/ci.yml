@@ -28,51 +28,51 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/career_pilot_test
-steps:
-  - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-  - name: Set up Ruby
-    uses: ruby/setup-ruby@v1
-    with:
-      ruby-version: "3.2.2"
-      bundler-cache: true
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+          bundler-cache: true
 
-  - name: Install dependencies
-    run: |
-      gem install bundler
-      bundle install --jobs 4 --retry 3
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
 
-  - name: Setup database
-    run: |
-      bundle exec rails db:create
-      bundle exec rails db:schema:load
-  - name: Install Node.js
-    uses: actions/setup-node@v3
-    with:
-      node-version: "18"
-      cache: "yarn"
+      - name: Setup database
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
 
-  - name: Install Yarn
-    run: npm install -g yarn
+      - name: Install Yarn
+        run: npm install -g yarn
 
-  - name: Install Node dependencies
-    run: yarn install
+      - name: Install Node dependencies
+        run: yarn install
 
-  - name: Setup Tailwind
-    run: |
-      npm install -D tailwindcss@^3.3.0
-      echo "module.exports = { content: ['./app/**/*.{html,erb,rb,js}'], theme: { extend: {} }, plugins: [] }" > tailwind.config.js
-      mkdir -p app/assets/builds app/assets/stylesheets
+      - name: Setup Tailwind
+        run: |
+          npm install -D tailwindcss@^3.3.0
+          echo "module.exports = { content: ['./app/**/*.{html,erb,rb,js}'], theme: { extend: {} }, plugins: [] }" > tailwind.config.js
+          mkdir -p app/assets/builds app/assets/stylesheets
 
-      if [ ! -f "app/assets/stylesheets/application.tailwind.css" ]; then
-        echo "@tailwind base; @tailwind components; @tailwind utilities;" > app/assets/stylesheets/application.tailwind.css
-      fi
+          if [ ! -f "app/assets/stylesheets/application.tailwind.css" ]; then
+            echo "@tailwind base; @tailwind components; @tailwind utilities;" > app/assets/stylesheets/application.tailwind.css
+          fi
 
-      npx tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify
-      RAILS_ENV=test bundle exec rails assets:precompile SECRET_KEY_BASE=dummy SKIP_CSS_BUILD=true || true
-  - name: Run tests
-    run: bundle exec rspec
+          npx tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify
+          RAILS_ENV=test bundle exec rails assets:precompile SECRET_KEY_BASE=dummy SKIP_CSS_BUILD=true || true
+      - name: Run tests
+        run: bundle exec rspec
 
-  - name: Run Rubocop
-    run: bundle exec rubocop
-    continue-on-error: true
+      - name: Run Rubocop
+        run: bundle exec rubocop
+        continue-on-error: true
