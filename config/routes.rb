@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'quick_applications/new'
+  get 'quick_applications/create'
   devise_for :users, controllers: { omniauth_callbacks: 'omniauth_callbacks' }
 
   # Page d'accueil et tableau de bord
@@ -14,6 +16,7 @@ Rails.application.routes.draw do
   end
 
   resources :technologies
+  resources :quick_applications, only: [:new, :create]
 
   # Route pour créer une candidature à partir d'une offre d'emploi
   get 'job_listings/:job_listing_id/apply', to: 'applications#new', as: 'new_job_application'
