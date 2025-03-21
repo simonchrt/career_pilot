@@ -35,7 +35,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2.2" # Modifiez selon votre version de Ruby
+          ruby-version: "3.2.2" # Mise à jour vers votre version de Ruby
           bundler-cache: true
 
       - name: Install dependencies
@@ -59,10 +59,23 @@ jobs:
       - name: Install Node dependencies
         run: yarn install
 
+      - name: Setup CSS compilation
+        run: |
+          # Créer la commande de compilation CSS temporaire pour CI si elle n'existe pas
+          if ! grep -q "\"build:css\"" package.json; then
+            sed -i 's/"scripts": {/"scripts": {\n    "build:css": "tailwindcss -i ./app\/assets\/stylesheets\/application.tailwind.css -o ./app\/assets\/builds\/tailwind.css --minify",/' package.json
+          fi
+
       - name: Compile assets
         run: |
-          bundle exec rails assets:precompile
-          bundle exec rails tailwindcss:build
+          # Vérifier que le dossier app/assets/builds existe
+          mkdir -p app/assets/builds
+
+          # Exécuter la commande de compilation CSS
+          yarn build:css || tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify
+
+          # Compiler les autres assets
+          bundle exec rails assets:precompile RAILS_ENV=test
 
       - name: Run tests
         run: bundle exec rspec
