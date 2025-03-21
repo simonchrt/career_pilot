@@ -6,6 +6,8 @@ class User < ApplicationRecord
   :omniauthable, omniauth_providers: [:github, :linkedin]
 
   has_many :oauth_providers, dependent: :destroy
+  has_many :applications, dependent: :destroy
+  has_many :job_listings, through: :applications
 
   validates :email, presence: true, uniqueness: true
   validates :username, uniqueness: true, allow_blank: true
