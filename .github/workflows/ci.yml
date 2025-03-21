@@ -35,7 +35,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.2.2"
+          ruby-version: "3.2.2" # Modifiez selon votre version de Ruby
           bundler-cache: true
 
       - name: Install dependencies
@@ -47,6 +47,22 @@ jobs:
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Node dependencies
+        run: yarn install
+
+      - name: Compile assets
+        run: |
+          bundle exec rails assets:precompile
+          bundle exec rails tailwindcss:build
 
       - name: Run tests
         run: bundle exec rspec
