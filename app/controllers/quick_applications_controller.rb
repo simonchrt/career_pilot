@@ -12,6 +12,7 @@ class QuickApplicationsController < ApplicationController
   end
 
   def create
+
     ActiveRecord::Base.transaction do
       # Gestion de l'entreprise
       if params[:use_existing_company] == "1" && params[:company_id].present?
@@ -20,12 +21,14 @@ class QuickApplicationsController < ApplicationController
         company = Company.create!(company_params)
       end
 
+
       # Création de l'offre d'emploi
       job_listing = JobListing.new(job_listing_params)
       job_listing.company = company
       job_listing.save!
 
       # Ajout des technologies
+
       if params[:technology_ids].present?
         params[:technology_ids].each do |technology_id|
           job_listing.job_technologies.create!(technology_id: technology_id)
