@@ -36,8 +36,12 @@ class CompaniesController < ApplicationController
   end
 
   def destroy
-    @company.destroy
-    redirect_to companies_url, notice: 'Entreprise supprimée avec succès.'
+    if @company.job_listings.exists?
+      redirect_to companies_url, alert: 'Cette entreprise ne peut pas être supprimée car elle a des offres d\'emploi associées.'
+    else
+      @company.destroy
+      redirect_to companies_url, notice: 'Entreprise supprimée avec succès.'
+    end
   end
 
   private

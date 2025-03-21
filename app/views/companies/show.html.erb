@@ -1,2 +1,129 @@
-<h1>Companies#show</h1>
-<p>Find me in app/views/companies/show.html.erb</p>
+<% content_for :page_title, @company.name %>
+<% content_for :page_actions do %>
+  <%= link_to "Éditer", edit_company_path(@company), class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+<% end %>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Informations sur l'entreprise
+    </h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Détails et offres d'emploi
+    </p>
+  </div>
+  <div class="border-t border-gray-200">
+    <dl>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Nom
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= @company.name %>
+        </dd>
+      </div>
+      <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Site web
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <% if @company.website.present? %>
+            <%= link_to @company.website, @company.website, target: "_blank", class: "text-blue-600 hover:text-blue-900" %>
+          <% else %>
+            <span class="text-gray-500">Non précisé</span>
+          <% end %>
+        </dd>
+      </div>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Secteur d'activité
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= @company.industry || "Non précisé" %>
+        </dd>
+      </div>
+      <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Localisation
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= @company.location || "Non précisée" %>
+        </dd>
+      </div>
+      <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Taille
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= @company.size || "Non précisée" %>
+        </dd>
+      </div>
+      <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">
+          Notes
+        </dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+          <%= simple_format(@company.notes) || "Aucune note" %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+<div class="mt-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-medium text-gray-900">Offres d'emploi</h2>
+    <%= link_to "Ajouter une offre", new_job_listing_path(company_id: @company.id), class: "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700" %>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <ul class="divide-y divide-gray-200">
+      <% if @job_listings.any? %>
+        <% @job_listings.each do |job_listing| %>
+          <li>
+            <%= link_to job_listing_path(job_listing), class: "block hover:bg-gray-50" do %>
+              <div class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-medium text-blue-600 truncate">
+                    <%= job_listing.title %>
+                  </p>
+                  <div class="ml-2 flex-shrink-0 flex">
+                    <% if job_listing.remote? %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Remote
+                      </span>
+                    <% end %>
+                    <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <%= job_listing.contract_type.humanize %>
+                    </span>
+                  </div>
+                </div>
+                <div class="mt-2 flex justify-between">
+                  <div class="flex flex-wrap">
+                    <% job_listing.technologies.each do |tech| %>
+                      <span class="mr-2 mb-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <%= tech.name %>
+                      </span>
+                    <% end %>
+                  </div>
+                  <% if job_listing.salary_min? && job_listing.salary_max? %>
+                    <span class="text-sm text-gray-500">
+                      <%= number_to_currency(job_listing.salary_min, unit: (job_listing.currency || "€"), precision: 0) %> -
+                      <%= number_to_currency(job_listing.salary_max, unit: (job_listing.currency || "€"), precision: 0) %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      <% else %>
+        <li>
+          <div class="text-center py-6">
+            <p class="text-gray-500">Cette entreprise n'a pas d'offres d'emploi pour le moment.</p>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
