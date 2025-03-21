@@ -92,3 +92,9 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "rspec-rails", "~> 7.1", groups: [:development, :test]
+gem "factory_bot_rails", "~> 6.4", groups: [:development, :test]
+gem "faker", "~> 3.5", groups: [:development, :test]
+gem "shoulda-matchers", "~> 6.4", groups: [:development, :test]
+gem "database_cleaner-active_record", "~> 2.2", groups: [:development, :test]
