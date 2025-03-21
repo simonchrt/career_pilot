@@ -11,18 +11,16 @@ window.mountReactComponent = (Component, elementId, props = {}) => {
   const element = document.getElementById(elementId);
   if (element) {
     const root = createRoot(element);
-    root.render(<Component {...props} />);
+    root.render(React.createElement(Component, props));
   }
 };
 
 // Importation des composants React
 import Dashboard from './components/Dashboard';
 import ApplicationsList from './components/ApplicationsList';
-import JobListingForm from './components/JobListingForm';
 
 // Exposition globale des composants
 window.ReactComponents = {
   Dashboard,
-  ApplicationsList,
-  JobListingForm
+  ApplicationsList
 };
